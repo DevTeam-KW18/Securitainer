@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>컨테이너 정보</title>
+</head>
+
+<script type="text/javascript" src=" http://maps.google.com/maps/api/js?v=3.3&sensor=true"></script>
+  <script type="text/javascript">
+  function initialize() {
+   var myLatlng = new google.maps.LatLng(37.556911,126.918694); //<- 위도와 경도
+   var myOptions = {
+    zoom: 15,
+    center: myLatlng,
+    mapTypeId: google.maps.MapTypeId.TERRAIN
+   }
+   var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+   var marker = new google.maps.Marker( {
+    position: myLatlng,
+    map: map,
+    title:"(주)서울" //<- 본인의 목적에 맞게수정
+   });
+   var infowindow = new google.maps.InfoWindow( {
+    content: "(주)서울시 마포구" //<- 본인의 목적에 맞게수정
+   });
+   infowindow.open(map,marker);
+  }
+  window.onload=function() {
+   initialize();
+  }
+  </script>
+
+  <style>
+    html {
+    background-color : silver;
+  }
+
+  input{
+    background: rgba(241, 241, 241, .7);
+    width: 100%;
+    padding: 14px;
+    border-radius: 4px;
+    border: 0;
+    color: #3E3E3E;
+}
+
+button[type=button]{
+  background-color: rgba(36, 41, 44, .9);
+  border : none;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border-radius: 4px;
+  color: white;
+  margin-bottom : 10px;
+}
+
+body{
+  padding:50px;
+  padding-top : 5px;
+  background: white;
+  max-width:30em;
+  margin: 6% auto;
+  box-shadow:1em 1em 0 0 rgba(0,0,0,.2);
+}
+
+
+#print_info{
+  background-color :#FAF4C0;
+  border : none;
+  width: 60%;
+  padding: 14px;
+  border-radius: 4px;
+  margin-bottom : 10px;
+}
+</style>
+
+<body>
+	<h1>컨테이너 정보</h1>
+	<div id="print_info">
+	<?php
+    		parse_str(getenv("QUERY_STRING"));
+      		//mysql 접속 계정 정보 설정
+   		$mysql_host = "3.35.0.137";
+    		$mysql_user = "s2moon98";
+    		$mysql_password = "Answldms98!";
+    		$mysql_db = "db";
+    		//connetc 설정(host,user,password)
+    		$conn = mysqli_connect("localhost","s2moon98","Answldms98!", "db") or die("fail");
+    		//db 연결
+    		$dbconn = mysqli_select_db($conn, $mysql_db);
+    		//charset UTF8
+    		mysqli_query("set names utf 8");
+    		//쿼리문 작성
+    		$query = "select * from information where id_code='".$id_code."'";
+    		
+      		//쿼리보내고 결과를 변수에 저장
+    		$result = mysqli_query($conn, $query);
+    		while($row = mysqli_fetch_array($result)){
+	  echo "GPS:".$row[gps]." <br>물품: ".$row[item]."<br>";
+	  echo "내부온도: ".$row[temp]."<br>내부습도: ".$row[humi]."<br>";
+	  		echo "기록시간: ".$row[time]."<br>";
+    		}
+    	?>
+	</div>
+
+    <div id="map_canvas" style="width:80%; height:300px; margin-bottom:20px"></div>
+
+    <button type = "button" onclick = "location.href = 'basic.html'">홈</button>
+    <?php
+		parse_str(getenv("QUERY_STRING"));
+			 echo "<button type = 'button' onclick = \"location.href = 'beforelist.html?id_code=".$id_code."'\">이전 목록 조회 </button>";
+     
+     echo "<button type = 'button' onclick = \"location.href = 'delete_container.php?id_code=".$id_code."'\">삭제하기 </button>";
+     echo "<button type = 'button' onclick = \"location.href = 'modify_container.html?id_code=".$id_code."'\">수정하기 </button>";
+
+	?>    
+</body>
+</html>
+
+

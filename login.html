@@ -1,0 +1,56 @@
+<?php 
+  include 'inc_head.php';
+?>
+<!doctype html>
+<html lang="ko">
+  <head>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <title>LOGIN</title>
+  </head>
+ <style>
+  html {
+    background-color : silver;
+  }
+
+  input{
+    background: rgba(241, 241, 241, .7);
+    width: 100%;
+    padding: 14px;
+    border-radius: 4px;
+    border: 0;
+    color: #3E3E3E;
+}
+
+button{
+  background-color: rgba(36, 41, 44, .9);
+  border : none;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border-radius: 4px;
+  color: white;
+  margin-bottom : 5px;
+}
+
+body{
+  padding:50px;
+  background: white;
+  max-width:30em;
+  margin: 6% auto;
+  box-shadow:1em 1em 0 0 rgba(0,0,0,.2);
+}
+ </style>
+               
+  <body>
+		    		     
+   <h1>LOGIN</h1>
+    <form name="loginform" action="login_result.php"  method="POST">
+       <p>ID &nbsp; <input type="text" class="check"  name="username" placeholder="ID" required /></p>
+        <p>PW  <input type="text" class="check" name="pwd" placeholder="Password" required/></p>
+        <button>로그인 하기 </button>
+        <button type="button" onclick="location.href='index.html' ">뒤로가기</button> 
+      </form>
+  
+  </body>
+</html>

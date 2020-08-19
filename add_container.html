@@ -1,0 +1,64 @@
+<html>
+
+	<head>
+		<title>컨테이너 추가</title>
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	</head>
+
+    <style>
+              html {
+    background-color : silver;
+  }
+
+  input{
+    background: rgba(241, 241, 241, .7);
+    width: 100%;
+    padding: 14px;
+    border-radius: 4px;
+    border: 0;
+    color: #3E3E3E;
+}
+
+button[type=submit]{
+  background-color: rgba(36, 41, 44, .9);
+  border : none;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border-radius: 4px;
+  color: white;
+  margin-bottom : 5px;
+}
+
+button[type=button]{
+  background-color: rgba(36, 41, 44, .9);
+  border : none;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border-radius: 4px;
+  color: white;
+}
+
+body{
+  padding:50px;
+  background: white;
+  max-width:30em;
+  margin: 6% auto;
+  box-shadow:1em 1em 0 0 rgba(0,0,0,.2);
+}
+    </style>
+
+	<body>
+		<form name="addForm" method="GET" action="add_container.php">		<h1>추가할 컨테이너 코드 등록</h1>
+			<p>CODE &nbsp;<input type="text" name="id_code" required></p>
+			<p>물품 &nbsp; &nbsp;<input type="text" name="item" required></p>
+			<p>소유자 &nbsp;<input type="text" name="owner" required></p>
+			<button type="submit"> 등록하기</button>
+			<button type="button" onclick="location.href='basic.html'">뒤로가기</button>
+		</form>
+	</body>
+</html>
+
+	
