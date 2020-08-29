@@ -61,14 +61,21 @@ body{
     </style>
 
 	<body>
-        <form name="addForm" method="GET" action="modify_container.php">		
-            <h1>컨테이너 수정</h1>
-			<p><input type="hidden" name="id_code" value="<?=$_GET['id_code']?>"></p>
-			<p>물품 &nbsp; &nbsp;<input type="text" name="item" required></p>
-			<p>소유자 &nbsp; &nbsp;<input type="text" name="owner" required></p>
-			
-			<button type="submit" onclick="modify();" > 수정하기</button>
-			<button type="button" onclick="location.href='basic.html?type=1'">뒤로가기</button>
+	<h1>상하역</h1>
+        <form name="addForm" method="GET" action="modify_load.php">		
+		<input type="hidden" name="id_code" value="<?=$_GET['id_code']?>"> </input>
+		<p>	
+		<label class="radio-inline">
+			하역안함<input type="radio" name="depart" value="0" checked/>
+			</label>
+			<label class="radio-inline">
+			하역함<input type="radio" name="depart" value="1"/>
+			</label>
+		</p>
+			<br>
+
+			<button type="submit" onclick="modify();" > 상/하역하기</button>
+			<button type="button" onclick="location.href='basic.html?type=2'">뒤로가기</button>
 		</form>
 	</body>
 </html>

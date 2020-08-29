@@ -4,6 +4,18 @@
 		<title>컨테이너 추가</title>
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+       <script type="text/javascript" src="web3.min.js"></script>
+        <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+	<script type="text/javascript">
+	    var web3 = new Web3();
+            web3.setProvider(new Web3.providers.HttpProvider('http://13.124.95.193:1112'));
+ 
+	  function makeAccount(){
+	   web3.eth.personal.newAccount($("#id_code").val());
+	    }
+	
+	</script>	
+	
 	</head>
 
     <style>
@@ -51,12 +63,19 @@ body{
     </style>
 
 	<body>
+		<?php
+	 		parse_str(getenv("QUERY_STRING"));
+	 	?>
 		<form name="addForm" method="GET" action="add_container.php">		<h1>추가할 컨테이너 코드 등록</h1>
-			<p>CODE &nbsp;<input type="text" name="id_code" required></p>
+			<p>CODE &nbsp;<input type="text" name="id_code" id="id_code" required></p>
 			<p>물품 &nbsp; &nbsp;<input type="text" name="item" required></p>
 			<p>소유자 &nbsp;<input type="text" name="owner" required></p>
-			<button type="submit"> 등록하기</button>
-			<button type="button" onclick="location.href='basic.html'">뒤로가기</button>
+			<p>하역 알림 &nbsp;<input type="text" name="depart" required></p>
+			<input type="hidden" name="index"/>
+
+			
+			<button type="submit" onclick="makeAccount();"> 등록하기</button>
+			<button type="button" onclick="location.href='basic.html?type='+'<?=$type?>'">뒤로가기</button>
 		</form>
 	</body>
 </html>

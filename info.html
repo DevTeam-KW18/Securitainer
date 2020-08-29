@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>컨테이너 정보</title>
 </head>
-
+  <script type="text/javascript" src="web3.min.js"></script>
+        <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 <script type="text/javascript" src=" http://maps.google.com/maps/api/js?v=3.3&sensor=true"></script>
   <script type="text/javascript">
   function initialize() {
@@ -77,44 +78,115 @@ body{
 
 <body>
 	<h1>컨테이너 정보</h1>
+
 	<div id="print_info">
-	<?php
-    		parse_str(getenv("QUERY_STRING"));
-      		//mysql 접속 계정 정보 설정
-   		$mysql_host = "3.35.0.137";
-    		$mysql_user = "s2moon98";
-    		$mysql_password = "Answldms98!";
-    		$mysql_db = "db";
-    		//connetc 설정(host,user,password)
-    		$conn = mysqli_connect("localhost","s2moon98","Answldms98!", "db") or die("fail");
-    		//db 연결
-    		$dbconn = mysqli_select_db($conn, $mysql_db);
-    		//charset UTF8
-    		mysqli_query("set names utf 8");
-    		//쿼리문 작성
-    		$query = "select * from information where id_code='".$id_code."'";
-    		
-      		//쿼리보내고 결과를 변수에 저장
-    		$result = mysqli_query($conn, $query);
-    		while($row = mysqli_fetch_array($result)){
-	  echo "GPS:".$row[gps]." <br>물품: ".$row[item]."<br>";
-	  echo "내부온도: ".$row[temp]."<br>내부습도: ".$row[humi]."<br>";
-	  		echo "기록시간: ".$row[time]."<br>";
-    		}
-    	?>
+	
+		 <script type="text/javascript">
+            var web3 = new Web3();
+            var standard=",";
+            var html;
+            var totalData=2000;
+		
+
+           var url=location.search;
+	   var params= new URLSearchParams(url);
+	   var coder= params.get('id_code');
+           console.log(coder);
+            web3.setProvider(new Web3.providers.HttpProvider('http://3.35.13.24:1112'));
+  $(function(){
+                /*
+                    https://github.com/ethereum/go-ethereum/wiki/Management-APIs
+                    http://localhost:8545
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 10,
+                        "method": "personal_listAccounts"
+                    }
+                */
+
+                web3.eth.getBlockNumber(function(e, blocknum) {
+			 for (var i = blocknum; i >=0; i--) {
+                            web3.eth.getBlock(i, false, function(e, block){
+                                if(block.transactions != ""){
+                                    for (var ii = 0; ii < block.transactions.length; ii++) {
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
+                                                var info=web3.utils.toUtf8(tx.input).split(',');
+
+
+                                                if(web3.utils.toUtf8(tx.input).split(",").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""){
+                                                
+						if(coder== info[0]){					
+							html="";
+                                                        html+='<tr>';
+                                                        html+='<td>id_code: '+info[0]+'</td>';
+                                                        html+='<td>time: '+info[1]+'</td>';
+                                                        html+='<td>owner:'+info[2]+'</td>';
+                                                        html+='<td>item: '+info[3]+'</td>';
+                                                        html+='<td>temperature: '+info[4]+'</td>';
+                                                        html+='<td>humidity: '+info[5]+'</td>';
+                                                        html+='<td>gas: '+info[6]+'</td>';
+                                                        html+='<td>gps: '+info[7]+'</td>';
+                                                        $("#print_info").append(html);
+						}
+                                                }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+		}
+                );
+            });
+
+</script>
+
+	
+ 
+	  
 	</div>
 
+
+	
     <div id="map_canvas" style="width:80%; height:300px; margin-bottom:20px"></div>
 
-    <button type = "button" onclick = "location.href = 'basic.html'">홈</button>
+    <button type = "button" onclick = "location.href = 'basic.html?type='+'<?= $type ?>'">홈</button>
     <?php
 		parse_str(getenv("QUERY_STRING"));
-			 echo "<button type = 'button' onclick = \"location.href = 'beforelist.html?id_code=".$id_code."'\">이전 목록 조회 </button>";
-     
-     echo "<button type = 'button' onclick = \"location.href = 'delete_container.php?id_code=".$id_code."'\">삭제하기 </button>";
-     echo "<button type = 'button' onclick = \"location.href = 'modify_container.html?id_code=".$id_code."'\">수정하기 </button>";
+			 echo "<button type = 'button' onclick = \"location.href = 'previousInfo.html?id_code=".$id_code."&type=".$type."'\">이전 목록 조회 </button>";
+	?>
+	    <?php
+                parse_str(getenv("QUERY_STRING"));
+                         echo "<button type = 'button' onclick = \"location.href = 'previousItem.html?id_code=".$id_code."&type=".$type."'\">이전 물품  조회 </button>";
+        ?>
 
-	?>    
+	<div id = "btn_div_01" style="display:none;">
+	<script language="javascript">
+		var type = '<?= $type ?>';
+		hide();
+		function hide(){
+			var obj = document.getElementById("btn_div_01");
+			if(type == "1")
+				obj.style.display = 'block';
+		}
+	</script>
+	<button type = "button" onclick = "location.href = 'modify_container.html?id_code='+'<?=$id_code?>'+'&type='+'<?=$type?>'">수정하기</button>
+
+	</div>
+
+	<div id = "btn_div_02" style="display:none;">
+        	<script language="javascript">
+                	var type2 = '<?= $type ?>';
+                	hide2();
+                	function hide2(){
+                        	var obj2 = document.getElementById("btn_div_02");
+                        	if(type2 == "2")
+                                	obj2.style.display = 'block';
+                	}
+        	</script>
+		<button type = "button" onclick = "location.href = 'modify_load.html?id_code='+'<?=$id_code?>'+'&type='+'<?=$type?>'">상하역</button>
+	</div>
+
 </body>
 </html>
 

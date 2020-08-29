@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<?php
+      $con = mysqli_connect("localhost","s2moon98","Answldms98!","db");
+
+      if(mysqli_connect_errno())
+      {
+         echo "Faild to eonnect to MySQL: " . mysqli_connect_error();
+      }
+
+      $num = $_GET['num'];
+      $num2 = $_GET['num2'];
+
+   $sql = "insert into db.test(num, num2) values('$num','$num2')";
+   mysqli_query($con, $sql);
+ $str='hello';
+   mysqli_close($con);
+
+?>
+
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <script type="text/javascript" src="web3.min.js"></script>
+        <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+        <script type="text/javascript">
+	var str='<?= $num ?>';
+	console.log(str);
+            var web3 = new Web3();
+            web3.setProvider(new Web3.providers.HttpProvider('http://13.124.95.193:1112'));
+	
+	    $(function(){
+                /*
+                    https://github.com/ethereum/go-ethereum/wiki/Management-APIs
+                    http://localhost:8545
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 10,
+                        "method": "personal_listAccounts"
+                    }
+                */
+                web3.eth.getAccounts().then(
+                    function (res) { 
+                        web3.eth.getBalance(res[0]).then(function (res2) {
+                                document.getElementById("accounts").append(res[0] + " / " + web3.utils.fromWei(res2, 'ether') + "ether" );
+                            }
+                        ) 
+                    }
+                )
+
+                web3.eth.getBlockNumber(function(e, blocknum) {
+                        document.getElementById("mined").append(blocknum);
+                        for (var i = 0; i < blocknum + 1; i++) {
+                            web3.eth.getBlock(i, false, function(e, block){
+                                $("#getBlock").append("<p>Num" + block.number + " " + block.hash + "</p>");
+                                if(block.transactions != ""){
+                                    $("#getBlock").append("<p>transactions (" + block.transactions + ")</p>");
+                                    for (var ii = 0; ii < block.transactions.length; ii++) {
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
+                                            $("#txInput").append("<p>input :: " + web3.utils.toUtf8(tx.input) + " (" + tx.input + ")</p>");
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                );
+            });
+
+            function sendTx(){
+                if($("#msg").val() == ""){
+                    alert("data를 입력해주세요");
+                    return;
+                }
+                web3.eth.getAccounts().then(
+                    function (res) { 
+                        web3.eth.getBalance(res[1]).then(function (res2) {
+                                web3.eth.personal.unlockAccount(res[1], "A0002", 600);
+                                web3.eth.sendTransaction({
+                                    from: res[1],
+                                    gasPrice: 0x1350,
+				    gasLimit: 0x3d0900,
+		
+		data: web3.utils.utf8ToHex(str) // deploying a contracrt
+                                }, function(error, hash){
+                                    console.log(error);
+                                    console.log(hash);
+                                    alert("sendTx " + error);
+                                });
+                            }
+                        ) 
+                    }
+                )
+            }
+
+        </script>
+
+        <title>ethereum web3</title>
+    </head>
+
+    <body>
+
+        <h1>ethereum web3</h1>
+	<hr>
+
+        <div style="background-color:azure">
+            <h2>web3.eth.getAccounts</h2>
+            <p id="accounts"></p>
+	    <form>
+	    <input type="hidden" name="num" id="num" value="<?php $num?>">	    
+	    <p><input type="text" id="msg" value = <?php echo $num; ?>> <span onclick="sendTx();">트랜잭션 발송하기</span></p>
+	    </form>
+	</div>
+
+        <div style="background-color:aquamarine">
+            <h2>defaultBlock</h2>
+            <p id="defaultBlock"></p>
+        </div>
+
+        <div style="background-color:bisque">
+            <h2>txInput</h2>
+            <p id="txInput"></p>
+        </div>
+
+        <div style="background-color:aliceblue">
+            <h2>web3.eth.getBlockNumber</h2>
+            <p id="mined"></p>
+        </div>
+        
+        <div style="background-color:aliceblue">
+            <h2>web3.eth.getBlock</h2>
+            <p id="getBlock"></p>
+        </div>
+    </body>
+</html>

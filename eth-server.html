@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--<meta http-equiv="refresh" content="10; URL=eth-server.html">
+	--!>
+<?php
+                        //mysql 접속 계정 정보 설정
+                        parse_str(getenv("QUERY_STRING"));
+                        $mysql_host = "3.35.0.137";
+                        $mysql_user = "s2moon98";
+                        $mysql_password = "Answldms98!";
+                        $mysql_db = "db";
+                        //connetc 설정(host,user,password)
+                        $conn = mysqli_connect("localhost","s2moon98","Answldms98!", "db") or die("fail");
+                        //db 연결
+                        $dbconn = mysqli_select_db($conn, $mysql_db);
+                        //charset UTF8
+                        mysqli_query("set names utf 8");
+                        mysqli_query($conn, "set session character_set_connection=utf8;");
+                        mysqli_query($conn, "set session character_set_results=utf8;");
+                        mysqli_query($conn, "set session character_set_client=utf8;");
+                        //쿼리문 작성
+                        $query = "select * from test";
+                        //쿼리보내고 결과를 변수에 저장
+                        $result = mysqli_query($conn, $query);
+                        $row = mysqli_fetch_array($result);
+                        $id_code = $row['id_code'];
+			$time = $row['time'];
+			$owner = $row['owner'];
+			$item = $row['item'];
+			$temp = $row['temp'];
+			$humi = $row['humi'];
+			$gas = $row['gas'];
+			$gps = $row['gps'];
+
+
+			$query2 = "select * from container where id_code = '{$id_code}'";
+ 			$result2 = mysqli_query($conn, $query2);
+                        $row2 = mysqli_fetch_array($result2);
+                        $my_index = $row2['my_index'];
+
+
+                        ?>
+
+
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <script type="text/javascript" src="web3.min.js"></script>
+        <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+        <script type="text/javascript">
+
+		var id_code = '<?= $id_code ?>';
+		var my_index = '<?= $my_index ?>';
+
+                var str='<?= $id_code ?>'+';'+'<?= $time ?>'+';'+'<?= $owner ?>'+';'+'<?= $item ?>'+';'+'<?= $temp ?>'+';'+'<?= $humi ?>'+';'+'<?= $gas ?>'+';'+'<?= $gps ?>';
+        
+
+            var web3 = new Web3();
+            web3.setProvider(new Web3.providers.HttpProvider('http://52.78.236.70:1112'));
+
+            $(function(){
+
+                web3.eth.getBlockNumber(function(e, blocknum) {
+                        //document.getElementById("mined").append(blocknum);
+                    }
+                );
+            });
+
+
+               window.onload = function sendTx(){
+                //document.getElementById("num").value = str;
+
+                web3.eth.getAccounts().then(
+                    function (res) {
+                        web3.eth.getBalance(res[my_index]).then(function (res2) {
+                                web3.eth.personal.unlockAccount(res[my_index], id_code, 600);
+                                web3.eth.sendTransaction({
+                                    from: res[my_index],
+                                    gasPrice: 0x1350,
+                                    gasLimit: 0x3d0900,
+
+                data: web3.utils.utf8ToHex(str) // deploying a contracrt
+                                }, function(error, hash){
+                                    console.log(error);
+                                    console.log(hash);
+                                   // alert("sendTx " + error);
+                                });
+                            }
+                        )
+                    }
+                )
+            }
+
+        </script>
+
+        <title>ethereum web3</title>
+    </head>
+
+    <body>
+
+        <h1>ethereum web3</h1>
+        <hr>
+
+        <div style="background-color:azure">
+            <h2>web3.eth.getAccounts</h2>
+            <p id="accounts"></p>
+            <form>
+            <input type="hidden" name="num" id="num" value="<?php $num?>">
+            <p><input type="text" id="msg"> <span onclick="sendTx();">트랜잭션 발송하기</span></p>
+
+            </form>
+        </div>
+
+    </body>
+</html>
+
+

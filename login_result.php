@@ -16,11 +16,13 @@
 	
         $username = $_POST[ 'username' ];
 	$pwd = $_POST[ 'pwd' ];
-	$sql = "SELECT id , pwd FROM db.user WHERE id='$username'AND pwd='$pwd'";
+	$sql = "SELECT id , pwd , type FROM db.user WHERE id='$username'AND pwd='$pwd'";
 	$result= $con->query($sql);	
 	if ( $result->num_rows>0 ) {
 		$_SESSION[ 'username' ] = $username;
-	 echo("<meta http-equiv='Refresh' content='1; URL=basic.html'>");
+		$ary = $result->fetch_assoc();
+		$result_type = $ary['type'];
+	 echo("<meta http-equiv='Refresh' content='1; URL=basic.html?type={$result_type}'>");
         } else {
 		echo("<meta http-equiv='Refresh' content='0; URL=login.html'>");
 
