@@ -7,7 +7,7 @@
         }
 
         body{
-                  padding:50px;
+		  padding:50px;
                   padding-top:3px;
                   background: white;
                   max-width:30em;
@@ -27,8 +27,7 @@
 
         th {
                   font-weight: 300;
-                  background-color:rgba(36, 41, 44:q
-                , .9);
+                  background-color:rgba(36, 41, 44:q, .9);
                   color: #fff;
                   border:rgba(36, 41, 44, .9);
         }
@@ -51,18 +50,34 @@
                  margin-bottom: 5px;
         }
 </style>
-    
         <meta charset="UTF-8">
         <script type="text/javascript" src="web3.min.js"></script>
         <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
         <script type="text/javascript">
             var web3 = new Web3();
-	    var standard=",";
+	    var standard=";";
 	    var html;
-	    var temp=location.href.split("?id_code=");
-	    var data=temp[1].split("&");
-            web3.setProvider(new Web3.providers.HttpProvider('http://3.35.13.24:1112'));
-  $(function(){
+	    var previous_time;
+	    var index=0;
+	    var url=location.search;
+            var params= new URLSearchParams(url);
+	    var id_code=params.get('id_code');
+ 	    var type= params.get('type');
+	    if(type==0){
+	        web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1111'));
+
+	    }
+	    else if(type==1){
+ 		web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1113'));
+           
+	    }
+	    else if(type==2){
+
+		web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1114'));
+            }
+
+
+$(function(){
                 /*
                     https://github.com/ethereum/go-ethereum/wiki/Management-APIs
                     http://localhost:8545
@@ -80,10 +95,13 @@
                                     for (var ii = 0; ii < block.transactions.length; ii++) {
                                         web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
                                         web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
-						var info=web3.utils.toUtf8(tx.input).split(',');
-
-	 if(web3.utils.toUtf8(tx.input).split(",").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""&&data[0]==info[0]){
-		
+						var info=web3.utils.toUtf8(tx.input).split(';');
+						if(index=0){
+							previous_time=info[1];
+							index++;
+						}
+	 if(web3.utils.toUtf8(tx.input).split(";").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""&&id_code==info[0]&&previous_time!=info[1]){
+							previous_time=info[1];
 							
 							html="";
 							html+='<tr>';
@@ -133,8 +151,8 @@
 
 		</tbody>
 	</table>
-
  <button type = "button" onclick = "location.href = 'basic.html?type='+'<?= $type ?>'">홈</button>
+<button  type="button" onclick="history.go(-1);">뒤로가기</button>
 
     </body>
 </html>

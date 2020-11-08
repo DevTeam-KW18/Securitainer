@@ -13,7 +13,7 @@
 	$id_code=$_GET['id_code'];
 	$item=$_GET['item'];
 	$owner=$_GET['owner'];
-	$depart=$_GET['depart'];
+	$depart=0;
 	header("Content-Type:text/html;charset=utf8");
 	$sql="insert into db.container(id_code,item,owner,depart) values('$id_code','$item','$owner','$depart')";
 	mysqli_query($con,$sql);

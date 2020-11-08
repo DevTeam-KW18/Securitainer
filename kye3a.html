@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript">
+                var totalData = 1000;    // 총 데이터 수
+    var dataPerPage = 20;    // 한 페이지에 나타낼 데이터 수
+    var pageCount = 10;        // 한 화면에 나타낼 페이지 수
+    
+    function paging(totalData, dataPerPage, pageCount, currentPage){
+        
+        console.log("currentPage : " + currentPage);
+        
+        var totalPage = Math.ceil(totalData/dataPerPage);    // 총 페이지 수
+        var pageGroup = Math.ceil(currentPage/pageCount);    // 페이지 그룹
+        
+        console.log("pageGroup : " + pageGroup);
+        
+        var last = pageGroup * pageCount;    // 화면에 보여질 마지막 페이지 번호
+        if(last > totalPage)
+            last = totalPage;
+        var first = last - (pageCount-1);    // 화면에 보여질 첫번째 페이지 번호
+        var next = last+1;
+        var prev = first-1;
+        
+        console.log("last : " + last);
+        console.log("first : " + first);
+        console.log("next : " + next);
+        console.log("prev : " + prev);
+ 
+        var $pingingView = $("#paging");
+        
+        var html = "";
+        
+        if(prev > 0)
+            html += "<a href=# id='prev'><</a> ";
+        
+        for(var i=first; i <= last; i++){
+            html += "<a href='#' id=" + i + ">" + i + "</a> ";
+        }
+        
+        if(last < totalPage)
+            html += "<a href=# id='next'>></a>";
+        
+        $("#paging").html(html);    // 페이지 목록 생성
+        $("#paging a").css("color", "black");
+        $("#paging a#" + currentPage).css({"text-decoration":"none", 
+                                           "color":"red", 
+                                           "font-weight":"bold"});    // 현재 페이지 표시
+                                           
+        $("#paging a").click(function(){
+            
+            var $item = $(this);
+            var $id = $item.attr("id");
+            var selectedPage = $item.text();
+            
+            if($id == "next")    selectedPage = next;
+            if($id == "prev")    selectedPage = prev;
+            
+            paging(totalData, dataPerPage, pageCount, selectedPage);
+        });
+                                           
+    }
+    
+    $("document").ready(function(){        
+        paging(totalData, dataPerPage, pageCount, 1);
+    });
+		
+		
+	    var web3 = new Web3();
+            web3.setProvider(new Web3.providers.HttpProvider("http://3.35.90.109:1111"));
+
+            $(function(){
+                /*
+                    https://github.com/ethereum/go-ethereum/wiki/Management-APIs
+                    http://localhost:8545
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 10,
+                        "method": "personal_listAccounts"
+                    }
+                */
+                web3.eth.getAccounts().then(
+                    function (res) { 
+                        web3.eth.getBalance(res[0]).then(function (res2) {
+                                document.getElementById("accounts").append(res[0] + " / " + web3.utils.fromWei(res2, 'ether') + "ether" );
+                            }
+                        ) 
+                    }
+                )
+
+                web3.eth.getBlockNumber(function(e, blocknum) {
+                        document.getElementById("mined").append(blocknum);
+                        for (var i = 0; i < blocknum + 1; i++) {
+                            web3.eth.getBlock(i, false, function(e, block){
+                                $("#getBlock").append("<p>Num" + block.number + " " + block.hash + "</p>");
+                                if(block.transactions != ""){
+                                    $("#getBlock").append("<p>transactions (" + block.transactions + ")</p>");
+                                    for (var ii = 0; ii < block.transactions.length; ii++) {
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
+						if( web3.utils.toUtf8(tx.input)!="TEST0"){
+                                            $("#txInput").append("<p>input :: " + web3.utils.toUtf8(tx.input) + " (" + tx.input + ")</p>");
+						}
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                );
+
+                //web3.eth.sign(web3.utils.utf8ToHex("Hello world sign"), "0x571aca1f83cd105c8745f5fd81ee6a75b44feaee").then(console.log);
+
+            });
+
+            function sendTx(){
+                if($("#msg").val() == ""){
+                    alert("data를 입력해주세요");
+                    return;
+                }
+                web3.eth.getAccounts().then(
+                    function (res) { 
+                        web3.eth.getBalance(res[0]).then(function (res2) { 
+                                web3.eth.personal.unlockAccount(res[1], "A0002", 60000);
+				 web3.eth.sendTransaction({
+                                    from: res[1],
+                                    gasPrice: 0x1350,
+                                    gasLimit: 0x3d0900,
+
+                                    data: web3.utils.utf8ToHex($("#msg").val()) // deploying a contracrt
+                                }, function(error, hash){
+                                    console.log(error);
+                                    console.log(hash);
+                                    alert("sendTx " + error);
+                                });
+                            }
+                        ) 
+                    }
+                )
+            }
+
+        </script>
+
+        <title>ethereum web3</title>
+    </head>
+
+    <body>
+
+        <h1>ethereum web3</h1>
+        <hr>
+
+        <div style="background-color:azure">
+            <h2>web3.eth.getAccounts</h2>
+            <p id="accounts"></p>
+            <p><input type="text" id="msg"/> <span onclick="sendTx();">트랜잭션 발송하기</span></p>
+        </div>
+
+        <div style="background-color:aquamarine">
+            <h2>defaultBlock</h2>
+            <p id="defaultBlock"></p>
+        </div>
+
+        <div style="background-color:bisque" >
+            <h2>txInput</h2>
+            <p id="txInput"></p>
+        </div>
+
+        <div style="background-color:aliceblue">
+            <h2>web3.eth.getBlockNumber</h2>
+            <p id="mined"></p>
+        </div>
+
+        <div style="background-color:aliceblue">
+            <h2>web3.eth.getBlock</h2>
+            <p id="getBlock"></p>
+        </div>
+	<div id="paging"></div>
+    </body>
+</html>
+

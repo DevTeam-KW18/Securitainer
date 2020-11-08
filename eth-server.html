@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!--<meta http-equiv="refresh" content="10; URL=eth-server.html">
-	--!>
+<meta http-equiv="refresh" content="10; URL=eth-server.html">
 <?php
                         //mysql 접속 계정 정보 설정
                         parse_str(getenv("QUERY_STRING"));
@@ -18,26 +17,30 @@
                         mysqli_query($conn, "set session character_set_results=utf8;");
                         mysqli_query($conn, "set session character_set_client=utf8;");
                         //쿼리문 작성
-                        $query = "select * from test";
+                        $query = "select * from measures order by id_code asc";
                         //쿼리보내고 결과를 변수에 저장
                         $result = mysqli_query($conn, $query);
-                        $row = mysqli_fetch_array($result);
-                        $id_code = $row['id_code'];
-			$time = $row['time'];
-			$owner = $row['owner'];
-			$item = $row['item'];
-			$temp = $row['temp'];
-			$humi = $row['humi'];
-			$gas = $row['gas'];
-			$gps = $row['gps'];
+                        $num= 0;
+
+			   while($row = mysqli_fetch_array($result)){
+                        	$id_code[$num] = $row['id_code'];
+				$my_id_code = $row['id_code'];
+				$time[$num] = $row['time'];
+				$item[$num] = $row['item'];
+				$temp[$num] = $row['temp'];
+				$humi[$num] = $row['humi'];
+				$gas[$num] = $row['gas'];
+				$gps[$num] = $row['gps'];
 
 
-			$query2 = "select * from container where id_code = '{$id_code}'";
- 			$result2 = mysqli_query($conn, $query2);
-                        $row2 = mysqli_fetch_array($result2);
-                        $my_index = $row2['my_index'];
+				$query2 = "select * from container where id_code = '{$my_id_code}'";
+ 				$result2 = mysqli_query($conn, $query2);
+                        	$row2 = mysqli_fetch_array($result2);
+                        	$my_index[$num] = $row2['my_index'];
+				$owner[$num] = $row2['owner'];
+				$num = $num + 1;
 
-
+			   }
                         ?>
 
 
@@ -50,14 +53,27 @@
         <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
         <script type="text/javascript">
 
-		var id_code = '<?= $id_code ?>';
-		var my_index = '<?= $my_index ?>';
+		var num = '<?= $num ?>';
 
-                var str='<?= $id_code ?>'+';'+'<?= $time ?>'+';'+'<?= $owner ?>'+';'+'<?= $item ?>'+';'+'<?= $temp ?>'+';'+'<?= $humi ?>'+';'+'<?= $gas ?>'+';'+'<?= $gps ?>';
-        
+		var str = new Array();
+		var id_code = new Array("<?=implode("\",\"",$id_code);?>");
+                var my_index = new Array("<?=implode("\",\"",$my_index);?>");
+                var time = new Array("<?=implode("\",\"",$time);?>");
+                var owner = new Array("<?=implode("\",\"",$owner);?>");
+                var item = new Array("<?=implode("\",\"",$item);?>");
+                var temp = new Array("<?=implode("\",\"",$temp);?>");
+                var humi = new Array("<?=implode("\",\"",$humi);?>");
+                var gas = new Array("<?=implode("\",\"",$gas);?>");
+                var gps = new Array("<?=implode("\",\"",$gps);?>");
+		
+		for (var i = 0; i< num; i++){
+			str[i]=id_code[i]+';'+time[i]+';'+owner[i]+';'+item[i]+';'+temp[i]+';'+humi[i]+';'+gas[i]+';'+gps[i];
+
+			console.log(str[i]);
+		}
 
             var web3 = new Web3();
-            web3.setProvider(new Web3.providers.HttpProvider('http://52.78.236.70:1112'));
+            web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1112'));
 
             $(function(){
 
@@ -69,25 +85,45 @@
 
 
                window.onload = function sendTx(){
-                //document.getElementById("num").value = str;
+              
 
                 web3.eth.getAccounts().then(
                     function (res) {
-                        web3.eth.getBalance(res[my_index]).then(function (res2) {
-                                web3.eth.personal.unlockAccount(res[my_index], id_code, 600);
-                                web3.eth.sendTransaction({
-                                    from: res[my_index],
+
+		web3.eth.personal.unlockAccount(res[0],"C0001",600);
+
+		for (var k = 0; k < 1;k++){
+
+
+
+                        web3.eth.getBalance(res[0]).then(function (res2) {
+
+		for (var i = 0; i < num; i++){
+
+			var temp = i+1;
+			var my_id_code = id_code[i];
+			web3.eth.sendTransaction({from:res[0],to:res[temp],value:'10000000000'})
+
+
+		var string = str[i];
+		console.log(string);
+
+                                web3.eth.personal.unlockAccount(res[temp], my_id_code, 600);
+				web3.eth.sendTransaction({
+                                    from: res[temp],
                                     gasPrice: 0x1350,
                                     gasLimit: 0x3d0900,
 
-                data: web3.utils.utf8ToHex(str) // deploying a contracrt
+                data: web3.utils.utf8ToHex(string) // deploying a contracrt
                                 }, function(error, hash){
                                     console.log(error);
                                     console.log(hash);
                                    // alert("sendTx " + error);
                                 });
                             }
+		}
                         )
+		}
                     }
                 )
             }

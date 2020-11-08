@@ -5,18 +5,7 @@
   <meta charset="utf-8" />
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
-<script type="text/javascript">
-   function fn_valiChk(){
-     var regForm = $("form[name='joinForm'] .check").length;
-     for(var i = 0; i<regForm; i++){
-       if($(".check").eq(i).val() == "" || $(".check").eq(i).val() == null){
-         alert($(".check").eq(i).attr("ID"));
-         return true;
-       }
-     }
 
-   }
- </script>
 
 <style>
   
@@ -68,11 +57,11 @@ body{
   <form name="joinForm" method="GET" action="insert_data.php">
       <h1>아이디와 비밀번호를 입력하세요</h1>
       <div>
-        <p>ID &nbsp;&nbsp; <input type="text" class="check" id="id" name="id"  style=" width:50%; text-align:left" required/></p>
-        <p>PW &nbsp;  <input type="text" class="check" id="pwd" name="pwd"  style="  width:50%; text-align:left" required/></p>
-        <p>TYPE <input type="radio" id="type" name= "type" value="0" required/>화주
-	<input type="radio" id="type" name= "type" value="1" required/>포워더
-	<input type="radio" id="type" name= "type" value="2"  required/>선사
+        <p style="font-size:24px;">ID &nbsp;&nbsp; <input type="text" class="check" id="id" name="id"  style=" width:50%; text-align:left" required/></p>
+        <p style="font-size:24px;">PW &nbsp;  <input type="text" class="check" id="pwd" name="pwd"  style="  width:50%; text-align:left" required/></p>
+	<p><table><p style="font-size:24px;">TYPE</p><td>화주 <input type="radio" id="type" name= "type" value="0" required/></td>
+		<td>운반업체<input type="radio" id="type" name= "type" value="1" required/></td>
+		<td>선사<input type="radio" id="type" name= "type" value="2"  required/></td></table>
 	</p>
 	
 

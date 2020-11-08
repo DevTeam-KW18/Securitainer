@@ -6,7 +6,21 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		  <script type="text/javascript">
             var web3 = new Web3();
-            web3.setProvider(new Web3.providers.HttpProvider('http://13.124.95.193:1112'));
+       var url=location.search;
+            var params= new URLSearchParams(url);
+            var type= params.get('type');
+            if(type==0){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1111'));
+
+            }
+            else if(type==1){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1113'));
+
+            }
+            else if(type==2){
+
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1114'));
+            }
 
      	     function modify){
           	 

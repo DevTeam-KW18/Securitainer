@@ -8,8 +8,11 @@
         <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 	<script type="text/javascript">
 	    var web3 = new Web3();
-            web3.setProvider(new Web3.providers.HttpProvider('http://13.124.95.193:1112'));
- 
+       var url=location.search;
+            var params= new URLSearchParams(url);
+            var type= params.get('type');
+
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1112'));
 	  function makeAccount(){
 	   web3.eth.personal.newAccount($("#id_code").val());
 	    }
@@ -70,7 +73,6 @@ body{
 			<p>CODE &nbsp;<input type="text" name="id_code" id="id_code" required></p>
 			<p>물품 &nbsp; &nbsp;<input type="text" name="item" required></p>
 			<p>소유자 &nbsp;<input type="text" name="owner" required></p>
-			<p>하역 알림 &nbsp;<input type="text" name="depart" required></p>
 			<input type="hidden" name="index"/>
 
 			

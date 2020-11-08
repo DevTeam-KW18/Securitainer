@@ -5,30 +5,94 @@
   <title>컨테이너 정보</title>
 </head>
   <script type="text/javascript" src="web3.min.js"></script>
-        <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
-<script type="text/javascript" src=" http://maps.google.com/maps/api/js?v=3.3&sensor=true"></script>
+  <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fd0844f263c2cd3bc23709ce0864ea61"></script>
   <script type="text/javascript">
-  function initialize() {
-   var myLatlng = new google.maps.LatLng(37.556911,126.918694); //<- 위도와 경도
-   var myOptions = {
-    zoom: 15,
-    center: myLatlng,
-    mapTypeId: google.maps.MapTypeId.TERRAIN
-   }
-   var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-   var marker = new google.maps.Marker( {
-    position: myLatlng,
-    map: map,
-    title:"(주)서울" //<- 본인의 목적에 맞게수정
-   });
-   var infowindow = new google.maps.InfoWindow( {
-    content: "(주)서울시 마포구" //<- 본인의 목적에 맞게수정
-   });
-   infowindow.open(map,marker);
-  }
-  window.onload=function() {
-   initialize();
-  }
+            var web3 = new Web3();
+            var standard=",";
+            var index=0;
+            var url=location.search;
+            var params= new URLSearchParams(url);
+            var coder= params.get('id_code');
+            var type= params.get('type');
+            if(type==0){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1111'));
+
+            }
+            else if(type==1){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1113'));
+
+            }
+            else if(type==2){
+
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1114'));
+            }
+
+
+  $(function(){
+                /*
+                    https://github.com/ethereum/go-ethereum/wiki/Management-APIs
+                    http://localhost:8545
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 10,
+                        "method": "personal_listAccounts"
+                    }
+                */
+
+                web3.eth.getBlockNumber(function(e, blocknum) {
+                         for (var i = blocknum; i >=0; i--) {
+                            web3.eth.getBlock(i, false, function(e, block){
+                                if(block.transactions != ""){
+                                    for (var ii = 0; ii < block.transactions.length; ii++) {
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
+                                        web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
+                                                var info=web3.utils.toUtf8(tx.input).split(';');
+
+
+                                                if(web3.utils.toUtf8(tx.input).split(";").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""){
+
+                                                	if(coder===info[0]&&index==0){
+                                                        	console.log(info[0]);
+                                                                index++;
+
+                                                        	$("#print_info").append("<p>id_code: "+ info[0]+"</p>time: "+info[1]+"<p> owner: "+info[2]+"</p>item: "+info[3]+"<p>temperature: "+info[4]+"</p> humidity: "+info[5] +"<p> gas: "+info[6]+ " </p>");
+                                                        	var data=info[7].split(',');
+                                                        	console.log(data[0]);console.log(data[1]);
+								
+             							var mapContainer = document.getElementById('map'), // 지도를 표>시할 div
+   								mapOption = {
+       									 center: new kakao.maps.LatLng(data[0], data[1]), // 지도의 중심좌표
+       								 	level: 3 // 지도의 확대 레벨
+    								};
+
+								var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+								// 마커가 표시될 위치입니다
+								var markerPosition  = new kakao.maps.LatLng(data[0], data[1]);
+
+								// 마커를 생성합니다
+								var marker = new kakao.maps.Marker({
+   					        		position: markerPosition
+								});
+
+								// 마커가 지도 위에 표시되도록 설정합니다
+								marker.setMap(map);
+                                              
+                                                	}
+
+                                                }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                }
+              );
+          });
+
+
+
   </script>
 
   <style>
@@ -69,7 +133,7 @@ body{
 #print_info{
   background-color :#FAF4C0;
   border : none;
-  width: 60%;
+  width: 80%;
   padding: 14px;
   border-radius: 4px;
   margin-bottom : 10px;
@@ -79,83 +143,22 @@ body{
 <body>
 	<h1>컨테이너 정보</h1>
 
-	<div id="print_info">
-	
-		 <script type="text/javascript">
-            var web3 = new Web3();
-            var standard=",";
-            var html;
-            var totalData=2000;
-		
-
-           var url=location.search;
-	   var params= new URLSearchParams(url);
-	   var coder= params.get('id_code');
-           console.log(coder);
-            web3.setProvider(new Web3.providers.HttpProvider('http://3.35.13.24:1112'));
-  $(function(){
-                /*
-                    https://github.com/ethereum/go-ethereum/wiki/Management-APIs
-                    http://localhost:8545
-                    {
-                        "jsonrpc": "2.0",
-                        "id": 10,
-                        "method": "personal_listAccounts"
-                    }
-                */
-
-                web3.eth.getBlockNumber(function(e, blocknum) {
-			 for (var i = blocknum; i >=0; i--) {
-                            web3.eth.getBlock(i, false, function(e, block){
-                                if(block.transactions != ""){
-                                    for (var ii = 0; ii < block.transactions.length; ii++) {
-                                        web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
-                                        web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
-                                                var info=web3.utils.toUtf8(tx.input).split(',');
-
-
-                                                if(web3.utils.toUtf8(tx.input).split(",").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""){
-                                                
-						if(coder== info[0]){					
-							html="";
-                                                        html+='<tr>';
-                                                        html+='<td>id_code: '+info[0]+'</td>';
-                                                        html+='<td>time: '+info[1]+'</td>';
-                                                        html+='<td>owner:'+info[2]+'</td>';
-                                                        html+='<td>item: '+info[3]+'</td>';
-                                                        html+='<td>temperature: '+info[4]+'</td>';
-                                                        html+='<td>humidity: '+info[5]+'</td>';
-                                                        html+='<td>gas: '+info[6]+'</td>';
-                                                        html+='<td>gps: '+info[7]+'</td>';
-                                                        $("#print_info").append(html);
-						}
-                                                }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-		}
-                );
-            });
-
-</script>
-
-	
- 
+	<div>
+		<p id="print_info"></p>
 	  
 	</div>
 
-
+	<?php
+                parse_str(getenv("QUERY_STRING"));
+        ?>
 	
-    <div id="map_canvas" style="width:80%; height:300px; margin-bottom:20px"></div>
-
-    <button type = "button" onclick = "location.href = 'basic.html?type='+'<?= $type ?>'">홈</button>
-    <?php
+    	<div id="map" style="width:80%; height:300px; margin-bottom:20px"></div>
+    	<button type = "button" onclick = "location.href = 'basic.html?type='+'<?= $type ?>'">홈</button>
+    	<?php
 		parse_str(getenv("QUERY_STRING"));
 			 echo "<button type = 'button' onclick = \"location.href = 'previousInfo.html?id_code=".$id_code."&type=".$type."'\">이전 목록 조회 </button>";
 	?>
-	    <?php
+	<?php
                 parse_str(getenv("QUERY_STRING"));
                          echo "<button type = 'button' onclick = \"location.href = 'previousItem.html?id_code=".$id_code."&type=".$type."'\">이전 물품  조회 </button>";
         ?>

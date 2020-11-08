@@ -58,15 +58,28 @@
         <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
         <script type="text/javascript">
             var web3 = new Web3();
-            var standard=",";
+            var standard=";";
             var html;
 	    var items;
 	    var owners;
 	    var index=0;
-            var temp=location.href.split("?id_code=");
-            var data=temp[1].split("&");
+	    var url=location.search;
+            var params= new URLSearchParams(url);
+            var id_code=params.get('id_code');
+            var type= params.get('type');
+            if(type==0){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1111'));
 
-            web3.setProvider(new Web3.providers.HttpProvider('http://3.35.13.24:1112'));
+            }
+            else if(type==1){
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1113'));
+
+            }
+            else if(type==2){
+
+                web3.setProvider(new Web3.providers.HttpProvider('http://3.35.90.109:1114'));
+            }
+
   $(function(){
                 /*
                     https://github.com/ethereum/go-ethereum/wiki/Management-APIs
@@ -77,7 +90,6 @@
                         "method": "personal_listAccounts"
                     }
                 */
-		console.log("dfdf");
                  web3.eth.getBlockNumber(function(e, blocknum) {
 			 for (var i = blocknum; i >=0; i--) {
                             web3.eth.getBlock(i, false, function(e, block){
@@ -85,18 +97,21 @@
 					for (var ii = 0; ii <block.transactions.length; ii++) {
                                         web3.eth.getTransaction(block.transactions[ii].toString('hex')).then(console.log);
                                         web3.eth.getTransaction(block.transactions[ii].toString('hex'), function(e, tx){
-                                                var info=web3.utils.toUtf8(tx.input).split(',');
+                                                var info=web3.utils.toUtf8(tx.input).split(';');
 						
-                                                if(web3.utils.toUtf8(tx.input).split(",").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""){
-                                                       if(index==0){
+                                                if(web3.utils.toUtf8(tx.input).split(";").length==8&&info[0]!=""&&info[1]!=""&&info[2]!=""&&info[3]!=""&&info[4]!=""&&info[5]!=""&&info[6]!=""&&info[7]!=""){
+
+                                                       if(index==0&&id_code===info[0]){
                                                         items=info[3];
                                                         owners=info[2];
-							 index++; 
-                                               		 }
-							else{
+                                               		index++;	 
+						       }
+							else if(index!=0){ 
+							console.log(id_code);
+							console.log(info[0]);
+							if(items!=info[3]&&id_code==info[0]||owners!=info[2]&&id_code===info[0]){
 							
-							if(items!=info[3]||owners!=info[2]&&data[0]==info[0]){
-								 html="";
+									  html="";
                                                                           html+='<tr>';
                                                                           html+='<td>'+info[0]+'</td>';
                                                                           html+='<td>'+info[3]+'</td>';
@@ -139,9 +154,9 @@
 
                 </tbody>
         </table>
-
+	<?php parse_str(getenv("QUERY_STRING")); ?>
  <button type = "button" onclick = "location.href = 'basic.html?type='+'<?= $type ?>'">홈</button>
-
+ <button  type="button" onclick="history.go(-1);">뒤로가기</button>
     </body>
 </html>
 
