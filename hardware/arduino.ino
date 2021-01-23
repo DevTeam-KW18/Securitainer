@@ -8,19 +8,19 @@
 #include <Servo.h>
 #include "DHT.h"
 
-#define SSID      "blank"      // your wifi network SSID
-#define KEY       "1234gogogo1289"      // your wifi network password
+#define SSID      ""      // your wifi network SSID
+#define KEY       ""      // your wifi network password
 #define AUTH       "WPA2"     // your wifi network security (NONE, WEP, WPA, WPA2)
 
 #define USE_DHCP_IP 1
 
 #if !USE_DHCP_IP
-#define MY_IP          "192.168.1.133"
-#define SUBNET         "255.255.255.0"
-#define GATEWAY        "192.168.1.254"
+#define MY_IP          ""
+#define SUBNET         ""
+#define GATEWAY        ""
 #endif
 
-#define HOST_IP        "54.180.65.150"
+#define HOST_IP        ""
 #define REMOTE_PORT    80
 #define PROTOCOL       "TCP"
 uint8_t _hour, _minute, _second, _year, _month, _day; // GPS로부터 시간값 읽기
