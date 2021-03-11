@@ -15,6 +15,10 @@ IoT와 블록체인을 활용한 컨테이너의 지능화 구현
 
 <br>
 
+### 🎞실행 동영상
+
+* https://www.youtube.com/watch?v=9gsWZcCO_Ps
+
 ### 💫 Main Function
 #### SW
 
