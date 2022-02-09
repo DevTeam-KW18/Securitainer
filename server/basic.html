@@ -81,12 +81,12 @@ button[type=button]{
 	  		<?php
     			//mysql 접속 계정 정보 설정
     			parse_str(getenv("QUERY_STRING"));
-			$mysql_host = "3.35.0.137";
-    			$mysql_user = "s2moon98";
-    			$mysql_password = "Answldms98!";
+			$mysql_host = "address";
+    			$mysql_user = "user";
+    			$mysql_password = "password";
     			$mysql_db = "db";
     			//connetc 설정(host,user,password)
-    			$conn = mysqli_connect("localhost","s2moon98","Answldms98!", "db") or die("fail");
+    			$conn = mysqli_connect("localhost","user","password", "db") or die("fail");
     			//db 연결
     			$dbconn = mysqli_select_db($conn, $mysql_db);
     			//charset UTF8
